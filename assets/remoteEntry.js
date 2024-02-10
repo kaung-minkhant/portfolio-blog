@@ -1,10 +1,10 @@
-import { _ as __vitePreload } from './preload-helper-39sqjyNp.js';
+import { _ as __vitePreload } from './preload-helper-wT3K2rf_.js';
 
 const exportSet = new Set(['Module', '__esModule', 'default', '_export_sfc']);
       let moduleMap = {
 "./blog":()=>{
       dynamicLoadingCss(["style-b_GrsuvU.css"], false, './blog');
-      return __federation_import('./__federation_expose_Blog-Y7mDAxng.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
+      return __federation_import('./__federation_expose_Blog-9sgiby2F.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
     const seen = {};
     const dynamicLoadingCss = (cssFilePaths, dontAppendStylesToHead, exposeItemName) => {
       const metaUrl = import.meta.url;
@@ -30,7 +30,7 @@ const exportSet = new Set(['Module', '__esModule', 'default', '_export_sfc']);
       });
     };
     async function __federation_import(name) {
-        return __vitePreload(() => import(name),true?__vite__mapDeps([]):void 0);
+        return __vitePreload(() => import(name),true?__vite__mapDeps([]):void 0,import.meta.url);
     }    const get =(module) => {
       if(!moduleMap[module]) throw new Error('Can not find remote module ' + module)
       return moduleMap[module]();

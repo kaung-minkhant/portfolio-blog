@@ -3,14 +3,14 @@ const scriptRel = (function detectScriptRel() {
     return relList && relList.supports && relList.supports('modulepreload')
         ? 'modulepreload'
         : 'preload';
-})();const assetsURL = function(dep) { return "/"+dep };const seen = {};const __vitePreload = function preload(baseModule, deps, importerUrl) {
+})();const assetsURL = function(dep, importerUrl) { return new URL(dep, importerUrl).href };const seen = {};const __vitePreload = function preload(baseModule, deps, importerUrl) {
     let promise = Promise.resolve();
     // @ts-expect-error true will be replaced with boolean later
     if (true && deps && deps.length > 0) {
         const links = document.getElementsByTagName('link');
         promise = Promise.all(deps.map((dep) => {
             // @ts-expect-error assetsURL is declared before preload.toString()
-            dep = assetsURL(dep);
+            dep = assetsURL(dep, importerUrl);
             if (dep in seen)
                 return;
             seen[dep] = true;

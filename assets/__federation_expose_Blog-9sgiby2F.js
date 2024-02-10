@@ -1,4 +1,4 @@
-import { importShared } from './__federation_fn_import-QkLAHQSw.js';
+import { importShared } from './__federation_fn_import-7Yh3MA2n.js';
 import { r as reactExports } from './__federation_shared_react--XDvrPc_.js';
 
 var jsxRuntime = {exports: {}};
