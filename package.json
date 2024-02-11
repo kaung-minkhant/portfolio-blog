@@ -13,8 +13,13 @@
   },
   "dependencies": {
     "gh-pages": "^6.1.1",
+    "quill-blot-formatter": "^1.0.5",
+    "quill-image-drop-and-paste": "^1.3.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-icons": "^5.0.1",
+    "react-quill": "^2.0.0",
+    "styled-components": "^6.1.8"
   },
   "homepage": "https://kaung-minkhant.github.io/portfolio-blog/",
   "devDependencies": {

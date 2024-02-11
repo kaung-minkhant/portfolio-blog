@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import federation from "@originjs/vite-plugin-federation";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   build: {
     target: "esnext",
@@ -17,9 +16,11 @@ export default defineConfig({
       filename: 'remoteEntry.js',
       // Modules to expose
       exposes: {
-        './blog': './src/App',
+        './blogEditorView': './src/views/editor/editor.view.jsx',
       },
-      shared: ['react', 'react-dom']
+      shared: [
+        'react', 'react-dom', 'styled-components', 'react-icons' 
+      ]
     })],
     base: "./",
 })
