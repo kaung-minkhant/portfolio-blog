@@ -1,6 +1,7 @@
 import { importShared } from './__federation_fn_import-Lz2QPQOM.js';
-import { j as jsxRuntimeExports, E as EditorView } from './editor.view-rzUZnfnF.js';
+import { j as jsxRuntimeExports } from './jsx-runtime-yPXpVdAV.js';
 import { r as reactDomExports } from './__federation_shared_react-dom-6rhX7AH_.js';
+import { E as EditorView } from './editor.view-mOgswmGH.js';
 
 var client = {};
 
