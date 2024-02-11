@@ -16,7 +16,7 @@ export default defineConfig({
       filename: 'remoteEntry.js',
       // Modules to expose
       exposes: {
-        './blogEditorView': './src/views/editor/editor.view.jsx',
+        './blogEditorView': './src/views/editor/editor.wrapper',
       },
       shared: [
         'react', 'react-dom', 'styled-components', 'react-icons' 
