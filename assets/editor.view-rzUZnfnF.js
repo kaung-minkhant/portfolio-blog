@@ -14387,6 +14387,7 @@ const QuillWrapper = styled$2.div`
   flex: 1;
   display: flex;
   flex-direction: column;
+  position: relative;
 `;
 
 const QuillToolBar = () => {

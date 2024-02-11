@@ -1,4 +1,4 @@
-import { j as jsxRuntimeExports, E as EditorView } from './editor.view-9tYSCspa.js';
+import { j as jsxRuntimeExports, E as EditorView } from './editor.view-rzUZnfnF.js';
 
 const EditorWrapper = () => {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(EditorView, {});
