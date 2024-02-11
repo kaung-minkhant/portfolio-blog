@@ -1,5 +1,5 @@
 import { importShared } from './__federation_fn_import-Lz2QPQOM.js';
-import { j as jsxRuntimeExports, EditorView } from './__federation_expose_BlogEditorView-ZDEMFK-E.js';
+import { j as jsxRuntimeExports, E as EditorView } from './editor.view-9tYSCspa.js';
 import { r as reactDomExports } from './__federation_shared_react-dom-6rhX7AH_.js';
 
 var client = {};
