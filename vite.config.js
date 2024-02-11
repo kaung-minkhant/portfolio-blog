@@ -17,6 +17,7 @@ export default defineConfig({
       // Modules to expose
       exposes: {
         './blogEditorView': './src/views/editor/editor.wrapper',
+        './sample': './src/components/sample.comp'
       },
       shared: [
         'react', 'react-dom', 'styled-components', 'react-icons' 
