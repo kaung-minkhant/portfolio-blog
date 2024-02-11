@@ -357,7 +357,7 @@ function satisfy(version, range) {
 }
 
 // eslint-disable-next-line no-undef
-const moduleMap = {'react':{get:()=>()=>__federation_import(new URL('__federation_shared_react--XDvrPc_.js', import.meta.url).href),import:true},'react-dom':{get:()=>()=>__federation_import(new URL('__federation_shared_react-dom-xrZ2K6C7.js', import.meta.url).href),import:true}};
+const moduleMap = {'react':{get:()=>()=>__federation_import(new URL('__federation_shared_react-leujszA8.js', import.meta.url).href),import:true},'react-dom':{get:()=>()=>__federation_import(new URL('__federation_shared_react-dom-6rhX7AH_.js', import.meta.url).href),import:true},'styled-components':{get:()=>()=>__federation_import(new URL('__federation_shared_styled-components-33Al2guc.js', import.meta.url).href),import:true},'react-icons':{get:()=>()=>__federation_import(new URL('__federation_shared_react-icons-9FghekZb.js', import.meta.url).href),import:true}};
 const moduleCache = Object.create(null);
 async function importShared(name, shareScope = 'default') {
   return moduleCache[name]

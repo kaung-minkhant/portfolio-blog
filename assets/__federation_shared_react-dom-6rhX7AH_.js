@@ -1,4 +1,5 @@
-import { r as reactExports, g as getDefaultExportFromCjs } from './__federation_shared_react--XDvrPc_.js';
+import { g as getDefaultExportFromCjs } from './_commonjsHelpers-9Q-OoQuc.js';
+import { r as reactExports } from './__federation_shared_react-leujszA8.js';
 
 var reactDom = {exports: {}};
 

@@ -1,6 +1,4 @@
-function getDefaultExportFromCjs (x) {
-	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
-}
+import { g as getDefaultExportFromCjs } from './_commonjsHelpers-9Q-OoQuc.js';
 
 var react = {exports: {}};
 
@@ -40,4 +38,4 @@ react_production_min.useTransition=function(){return U.current.useTransition()};
 var reactExports = react.exports;
 const index = /*@__PURE__*/getDefaultExportFromCjs(reactExports);
 
-export { index as default, getDefaultExportFromCjs as g, reactExports as r };
+export { index as default, reactExports as r };

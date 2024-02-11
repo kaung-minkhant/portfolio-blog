@@ -2,9 +2,9 @@ import { _ as __vitePreload } from './preload-helper-wT3K2rf_.js';
 
 const exportSet = new Set(['Module', '__esModule', 'default', '_export_sfc']);
       let moduleMap = {
-"./blog":()=>{
-      dynamicLoadingCss(["style-b_GrsuvU.css"], false, './blog');
-      return __federation_import('./__federation_expose_Blog-9sgiby2F.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
+"./blogEditorView":()=>{
+      dynamicLoadingCss(["style-ktlpmv6u.css"], false, './blogEditorView');
+      return __federation_import('./__federation_expose_BlogEditorView-ZDEMFK-E.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
     const seen = {};
     const dynamicLoadingCss = (cssFilePaths, dontAppendStylesToHead, exposeItemName) => {
       const metaUrl = import.meta.url;
