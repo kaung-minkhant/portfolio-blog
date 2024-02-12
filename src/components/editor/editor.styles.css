@@ -2,6 +2,9 @@
   position: sticky;
   top: 5px;
 }
+.ql-container.ql-snow {
+  border-top: none !important;
+}
 
 .fr-box {
   width: 100%;

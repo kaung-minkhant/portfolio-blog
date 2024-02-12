@@ -28,6 +28,10 @@ export const QuillToolBar = () => {
         <button className="ql-underline" />
         <button className="ql-strike" />
       </span>
+      {/* <select className="ql-formats">
+        <option value="0" className="ql-bold">
+        </option>
+      </select> */}
       <span className="ql-formats">
         <button className="ql-list" value="ordered" />
         <button className="ql-list" value="bullet" />
@@ -51,7 +55,7 @@ export const QuillToolBar = () => {
         {/* <button className="ql-video" /> */}
       </span>
       <span className="ql-formats">
-        {/* <button className="ql-formula" /> */}
+        <button className="ql-formula" />
         <button className="ql-code-block" />
         <button className="ql-clean" />
       </span>

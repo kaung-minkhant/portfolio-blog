@@ -2,8 +2,9 @@ import { BlogMetaDataContainer, BlogTitle, BlogTitleInput, BlogMetaDataLabel, Ed
 import './editor.styles.css'
 import { EditorFieldContext } from '../../views/editor/editor.view'
 import { useContext, useEffect, useRef } from 'react'
+
 import "react-quill/dist/quill.snow.css"
-import { QuillToolBar } from './editorToolbar.comp'
+import {QuillToolBar} from './editorToolbar.comp'
 import { useEditorHook } from './editor.hook'
 
 export const EditorComponent = () => {

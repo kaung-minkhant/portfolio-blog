@@ -1,5 +1,6 @@
 import { MarkdownContainer, Preview, PreviewTitle } from "./preview.styles";
-import { EditorFieldContext } from "../../views/editor/editor.view"; import { useContext } from "react";
+import { EditorFieldContext } from "../../views/editor/editor.view"; 
+import { useContext } from "react";
 import QuillEditor from 'react-quill'
 import 'react-quill/dist/quill.bubble.css'
 
@@ -9,11 +10,11 @@ export const PreviewComponent = () => {
     <Preview>
       <PreviewTitle>Preview</PreviewTitle> 
       <MarkdownContainer>
-      <QuillEditor
+      {/* <QuillEditor
         value={editorField}
         readOnly={true}
         theme={"bubble"}
-      />
+      /> */}
       </MarkdownContainer>
     </Preview>
   )

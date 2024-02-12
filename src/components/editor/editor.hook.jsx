@@ -1,16 +1,19 @@
 import { useMemo, useCallback } from "react";
 import { Quill } from "react-quill";
+import katex from 'katex'
+import 'katex/dist/katex.min.css';
+window.katex = katex;
 
 import BlotFormatter from 'quill-blot-formatter/dist/BlotFormatter';
 import QuillImageDropAndPaste from 'quill-image-drop-and-paste'
 
-const Size = Quill.import('formats/size');
 
 Quill.register({
   "modules/blotFormatter": BlotFormatter,
   "modules/imageDropAndPaste": QuillImageDropAndPaste,
-})
+}, true)
 
+const Size = Quill.import('formats/size');
 Size.whitelist = ["extra-small", "small", "medium", "large"];
 Quill.register(Size, true)
 
@@ -24,6 +27,9 @@ Font.whitelist = [
   "lucida"
 ];
 Quill.register(Font, true);
+
+const Formula = Quill.import("formats/formula")
+Quill.register(Formula, true)
 
 
 export const useEditorHook = (quill) => {
@@ -90,6 +96,7 @@ export const useEditorHook = (quill) => {
         image: imageInsertHandler,
       }
     },
+    // table: false,
     blotFormatter: {},
     imageDropAndPaste: {
       handler: imagePasteHandler,
