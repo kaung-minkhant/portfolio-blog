@@ -34,7 +34,7 @@ Quill.register(Formula, true)
 
 export const useEditorHook = (quill) => {
   function upload(image, image64) {
-    return fetch("https://2qr5qnup9a.execute-api.ap-southeast-1.amazonaws.com/development/file_upload", {
+    return fetch(import.meta.env.VITE_IMAGE_UPLOAD, {
       method: "POST",
       mode: "cors",
       body: JSON.stringify({
