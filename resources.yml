@@ -1,0 +1,375 @@
+## naming: Project-Environment-Resource
+
+Parameters:
+  ProjectName:
+    Type: String
+    Description: 'Project Name'
+  Environment:
+    Type: String
+    Description: 'Environment for this stack'
+    Default: 'Development'
+    AllowedValues:
+      - Development
+      - Production
+
+Mappings:
+  EnvToSuffix:
+    Development:
+      suffix: "development"
+    Production:
+      suffix: "production"
+
+Resources:
+  ## Create a bucket
+  websiteBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: !Join [ '-', [ !Ref ProjectName, !FindInMap [EnvToSuffix, !Ref Environment, suffix], "bucket" ]]
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      WebsiteConfiguration:
+        IndexDocument: index.html
+  
+  blogImagesBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: !Join [ '-', [ !Ref ProjectName, !FindInMap [EnvToSuffix, !Ref Environment, suffix], "blog-img-bucket" ]]
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      WebsiteConfiguration:
+        IndexDocument: index.html
+
+  ## Bucket Access Policy
+  BucketAccessPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    DependsOn: websiteBucket  
+    Properties:
+      Bucket:
+        Ref: 'websiteBucket'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource:
+              Fn::Join:
+                - ''
+                - - 'arn:aws:s3:::'
+                  - Ref: 'websiteBucket'
+                  - '/*'
+  
+  BlogImgBucketAccessPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    DependsOn: blogImagesBucket  
+    Properties:
+      Bucket:
+        Ref: 'blogImagesBucket'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource:
+              Fn::Join:
+                - ''
+                - - 'arn:aws:s3:::'
+                  - Ref: 'blogImagesBucket'
+                  - '/*'
+
+  ## Create a user
+  User:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Join [ '-' , [
+          !Ref ProjectName,
+          !FindInMap [EnvToSuffix, !Ref Environment, suffix],
+          !Ref AWS::Region,
+          "user"
+        ]
+      ]
+
+  ## Create Policy
+  Policy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Join [ '-', [ !Ref ProjectName, !FindInMap [EnvToSuffix, !Ref Environment, suffix], "user-policy", ] ]
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: 's3:GetBucketLocation'
+            Resource:
+              - arn:aws:s3:::*
+          - Effect: Allow
+            Action:
+              - s3:PutBucketWebsite
+              - s3:PutObject
+              - s3:PutObjectAcl
+              - s3:GetObject
+              - s3:ListBucket
+              - s3:DeleteObject
+            Resource:
+              - !GetAtt websiteBucket.Arn
+              - !Join [
+                '', [
+                  !GetAtt websiteBucket.Arn,
+                  "/*"
+                ]
+              ]
+              - !GetAtt blogImagesBucket.Arn
+              - !Join [
+                '', [
+                  !GetAtt blogImagesBucket.Arn,
+                  "/*"
+                ]
+              ]
+      Users: 
+        - !Ref User
+    DependsOn:
+      - User
+      - websiteBucket
+      - blogImagesBucket
+
+  ## Create Access Key
+  UserAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref User
+    DependsOn: User
+
+  ## for delete s3 objects
+  CustomResourceLambdaExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: S3Policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:List*
+                  - s3:DeleteObject
+                  - s3:PutObject
+                  - s3:GetObject
+                Resource: '*'
+      ManagedPolicyArns: 
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+
+  CustomResourceLambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code:
+        ZipFile: |
+          import cfnresponse
+          import boto3
+
+          def handler(event, context):
+              print(event)
+              print('boto version ' + boto3.__version__)
+
+              # Globals
+              responseData = {}
+              ResponseStatus = cfnresponse.SUCCESS
+              s3bucketName = event['ResourceProperties']['s3bucketName']
+
+              if event['RequestType'] == 'Create':
+                  responseData['Message'] = "Resource creation successful!"
+
+              elif event['RequestType'] == 'Update':
+                  responseData['Message'] = "Resource update successful!"
+
+              elif event['RequestType'] == 'Delete':
+                  # Need to empty the S3 bucket before it is deleted
+                  s3 = boto3.resource('s3')
+                  bucket = s3.Bucket(s3bucketName)
+                  bucket.objects.all().delete()
+
+                  responseData['Message'] = "Resource deletion successful!"
+
+              cfnresponse.send(event, context, ResponseStatus, responseData)
+
+      Handler: index.handler
+      Runtime: python3.12
+      Role: !GetAtt CustomResourceLambdaExecutionRole.Arn
+
+  DeleteWebsiteS3Content:
+    Type: Custom::CustomResource
+    Properties:
+      ServiceToken: !GetAtt CustomResourceLambdaFunction.Arn
+      s3bucketName: !Ref websiteBucket
+    DependsOn: websiteBucket
+
+  DeleteBlogImgS3Content:
+    Type: Custom::CustomResource
+    Properties:
+      ServiceToken: !GetAtt CustomResourceLambdaFunction.Arn
+      s3bucketName: !Ref blogImagesBucket
+    DependsOn: blogImagesBucket
+
+  ## Cloudfront Distribution
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig: 
+        Enabled: true
+        DefaultCacheBehavior:
+          ViewerProtocolPolicy: redirect-to-https
+          TargetOriginId: SampleDistribution
+          ForwardedValues:
+            QueryString: true
+        Origins: 
+          - Id: SampleDistribution
+            DomainName: !Join [ '-',  [!Join [ '.', [!Ref websiteBucket, 's3-website']], !Join [ '.', [ !Ref AWS::Region, 'amazonaws.com']] ]]
+            CustomOriginConfig:
+              OriginProtocolPolicy: http-only
+    DependsOn: websiteBucket
+  
+  ## Lambda for uploading files
+  FileUploadToS3Lambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile:  |
+          const AWS = require("aws-sdk");
+          const s3 = new AWS.S3();
+          const BucketName=process.env.bucketName
+          exports.handler = async (event) => {
+            const response = {
+              isBase64Encoded: false,
+              statusCode: 200,
+              body: JSON.stringify({message: "successfully uploaded"})
+            };
+            const CORS_HEADERS = { 
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
+            };
+
+            try {
+              const parsedBody = JSON.parse(event.body);
+              const base64File = parsedBody.file;
+              const contentType = parsedBody.type;
+              const folder = parsedBody.folder;
+              const fileName = parsedBody.fileName;
+              const decodedFile = Buffer.from(base64File.replace(/^data:image\/\w+;base64,/,""), "base64")
+              const params = {
+                Bucket: BucketName,
+                Key: `${folder}/${fileName}`,
+                Body: decodedFile,
+                ContentType: contentType,
+              }
+
+              const uploadResult = await s3.upload(params).promise();
+
+              response.body = JSON.stringify({message: "successfully uploaded", uploadResult, url: uploadResult.Location, fileName: fileName})
+              response.headers = CORS_HEADERS;
+            } catch (e) {
+              console.error(e);
+              response.body = JSON.stringify({message: "file failed to upoad", error: e})
+              response.headers = CORS_HEADERS;
+            }
+            return response;
+          }
+      Environment:
+        Variables:
+          bucketName: !Ref blogImagesBucket
+      Description: Lambda to handle uploading files to S3
+      FunctionName: !Join [ '-', [ !Ref ProjectName, !FindInMap [EnvToSuffix, !Ref Environment, suffix], "fileUpload-lambda", ] ]
+      Role: !GetAtt CustomResourceLambdaExecutionRole.Arn
+      Handler: index.handler
+      Runtime: nodejs14.x
+
+  ## API Gateway
+  apiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Description: "API GateWay for Portfolio"
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+      Name: !Join [ '-', [ !Ref ProjectName, !FindInMap [EnvToSuffix, !Ref Environment, suffix], "api-gateway", ] ]
+
+  fileUploadResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref apiGateway
+      ParentId: !GetAtt apiGateway.RootResourceId
+      PathPart: 'file_upload'
+
+  fileUploadResourceMethod:
+    DependsOn: fileUploadMethodInvokePermission
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !GetAtt FileUploadToS3Lambda.Arn
+      ResourceId: !Ref fileUploadResource
+      RestApiId: !Ref apiGateway
+
+  apiGatewayDeployment04:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - fileUploadResourceMethod
+    Properties:
+      RestApiId: !Ref apiGateway
+      StageName: !FindInMap [EnvToSuffix, !Ref Environment, suffix]
+
+  fileUploadMethodInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt FileUploadToS3Lambda.Arn
+      Principal: apigateway.amazonaws.com
+      # note: if route *not* at API Gateway root, `SourceArn` would take the form of:
+      #               arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiGateway}/${apiGatewayStageName}/${apiGatewayHTTPMethod}/PATH_PART
+      SourceArn: !Sub 
+        - arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiGateway}/${apiGatewayStageName}/${apiGatewayHTTPMethod}/file_upload
+        - apiGatewayStageName: !FindInMap [EnvToSuffix, !Ref Environment, suffix]
+          apiGatewayHTTPMethod: POST
+
+
+
+Outputs:
+  UserAccessKey:
+    Description: 'Access Key for user'
+    Value: !Ref UserAccessKey
+  UserSecretAccessKey:
+    Description: 'Secret Access Key for user'
+    Value: !GetAtt UserAccessKey.SecretAccessKey
+  WebsiteURL:
+    Description: 'Website URL for Website'
+    Value: !GetAtt websiteBucket.WebsiteURL
+  CloudFrontWebsiteURL:
+    Description: 'Cloudfront URL for Website'
+    Value: !GetAtt CloudFrontDistribution.DomainName
+  BlogImageUploadAPIEndpoint:
+    Description: 'API Endpoint for Blog image upload'
+    Value: !Join
+      - ''
+      - - !Ref apiGateway
+        - .execute-api.ap-southeast-1.amazonaws.com/
+        - !FindInMap [EnvToSuffix, !Ref Environment, suffix]
+        - /file_upload
