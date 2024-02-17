@@ -34650,7 +34650,7 @@ const Formula = lib.Quill.import("formats/formula");
 lib.Quill.register(Formula, true);
 const useEditorHook = (quill) => {
   function upload(image, image64) {
-    return fetch("https://2qr5qnup9a.execute-api.ap-southeast-1.amazonaws.com/development/file_upload", {
+    return fetch("https://fx5j469rf9.execute-api.ap-southeast-1.amazonaws.com/development/file_upload", {
       method: "POST",
       mode: "cors",
       body: JSON.stringify({
